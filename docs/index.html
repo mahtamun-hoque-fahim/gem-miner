@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gem Miner &mdash; Export Gemini Chats as PDF</title>
+<meta name="description" content="Export any Gemini AI conversation as a clean, formatted PDF with one click. Free browser extension for Chrome, Edge, and Firefox.">
+<meta property="og:title"       content="Gem Miner &mdash; Export Gemini Chats as PDF">
+<meta property="og:description" content="One click. Clean PDF. Every Gemini conversation, beautifully archived.">
+<meta property="og:type"        content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* -- Tokens ------------------------------------------ */
+:root {
+  --bg:        #070807;
+  --bg2:       #0c0e0c;
+  --surface:   #111311;
+  --surface2:  #181a18;
+  --border:    #252825;
+  --border2:   #1e201e;
+  --mint:      #3DF49A;
+  --mint-mid:  #1a9e5c;
+  --mint-dark: #0f5c34;
+  --mint-glow: rgba(61,244,154,.15);
+  --text:      #dce8dc;
+  --text-2:    #9aaa9a;
+  --text-3:    #5a6a5a;
+  --font:      'Plus Jakarta Sans', system-ui, sans-serif;
+  --mono:      'JetBrains Mono', 'Courier New', monospace;
+  --r:         10px;
+  --r-sm:      6px;
+}
+
+/* -- Reset ------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+
+/* -- Nav --------------------------------------------- */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid var(--border2);
+  background: rgba(7,8,7,.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.nav-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: -.01em;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+.nav-links a {
+  font-size: 13px;
+  color: var(--text-2);
+  transition: color .15s;
+}
+.nav-links a:hover { color: var(--text); }
+.nav-cta {
+  background: var(--mint) !important;
+  color: #040604 !important;
+  font-weight: 700;
+  font-size: 13px !important;
+  padding: 7px 16px;
+  border-radius: var(--r-sm);
+  transition: background .15s !important;
+}
+.nav-cta:hover { background: #5bfaad !important; }
+
+/* -- Hero -------------------------------------------- */
+#hero {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 80px 24px 60px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+.hero-copy { display: flex; flex-direction: column; gap: 20px; }
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--mint);
+}
+.hero-eyebrow-dot {
+  width: 5px; height: 5px;
+  background: var(--mint);
+  border-radius: 50%;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%,100%{ opacity:1; transform:scale(1); }
+  50%    { opacity:.4; transform:scale(.7); }
+}
+.hero-h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -.03em;
+  color: #fff;
+}
+.hero-h1 em {
+  font-style: normal;
+  color: var(--mint);
+}
+.hero-sub {
+  font-size: 15.5px;
+  color: var(--text-2);
+  max-width: 420px;
+  line-height: 1.7;
+}
+.hero-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--mint);
+  color: #040604;
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 13.5px;
+  padding: 10px 20px;
+  border-radius: var(--r-sm);
+  border: none;
+  cursor: pointer;
+  transition: background .15s, transform .1s;
+  letter-spacing: -.01em;
+}
+.btn-primary:hover  { background: #5bfaad; }
+.btn-primary:active { transform: scale(.97); }
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font);
+  font-weight: 600;
+  font-size: 13.5px;
+  padding: 10px 20px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+  letter-spacing: -.01em;
+}
+.btn-secondary:hover { border-color: var(--text-2); background: var(--surface2); }
+.hero-browsers {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11.5px;
+  color: var(--text-3);
+}
+.browser-chips {
+  display: flex;
+  gap: 6px;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-3);
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 2px 9px;
+}
+
+/* -- Popup mockup ------------------------------------ */
+.hero-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  position: relative;
+}
+.mock-glow {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  background: var(--mint-glow);
+  filter: blur(60px);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+/* Extension popup */
+.mock-popup {
+  width: 220px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 20px 50px rgba(0,0,0,.5);
+}
+.mp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.mp-logo {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.mp-badge {
+  font-size: 9px;
+  color: var(--text-3);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 1px 6px;
+  border-radius: 20px;
+}
+.mp-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 8px 9px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.mp-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px;
+}
+.mp-label { font-size: 10px; color: var(--text-3); }
+.mp-val   { font-size: 10.5px; font-weight: 600; color: var(--text); }
+.mp-trunc { font-size: 10px; color: var(--text-2); max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mp-field-label { font-size: 9.5px; color: var(--text-3); margin-bottom: 3px; }
+.mp-input {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 5px 8px;
+  font-size: 10px;
+  color: var(--text-2);
+  font-family: var(--font);
+  width: 100%;
+}
+.mp-theme-row { display: flex; gap: 4px; margin-top: 6px; }
+.mp-theme-btn {
+  flex: 1;
+  font-size: 9.5px;
+  font-family: var(--font);
+  padding: 4px 0;
+  border-radius: 4px;
+  cursor: default;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-3);
+  text-align: center;
+}
+.mp-theme-btn.active {
+  border-color: var(--mint);
+  background: rgba(61,244,154,.1);
+  color: var(--mint);
+}
+.mp-check {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9.5px;
+  color: var(--text-3);
+  margin-top: 5px;
+}
+.mp-check-box {
+  width: 10px; height: 10px;
+  border-radius: 2px;
+  background: var(--mint);
+  flex-shrink: 0;
+}
+.mp-export {
+  background: var(--mint);
+  color: #040604;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font);
+  text-align: center;
+  padding: 8px;
+  border-radius: 6px;
+  margin-top: 2px;
+}
+.mp-status {
+  font-size: 9.5px;
+  color: var(--mint);
+  text-align: center;
+}
+
+/* Arrow between popup and PDF */
+.mock-arrow {
+  display: flex;
+  align-items: center;
+  z-index: 1;
+  color: var(--mint);
+  opacity: .6;
+}
+
+/* PDF preview */
+.mock-pdf {
+  width: 195px;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0,0,0,.5);
+  position: relative;
+  z-index: 1;
+}
+.pdf-header {
+  padding: 10px 12px 8px;
+  border-bottom: 2.5px solid var(--mint);
+}
+.pdf-title { font-size: 10px; font-weight: 700; color: #111; letter-spacing: -.01em; }
+.pdf-sub   { font-size: 7.5px; color: #888; margin-top: 2px; }
+.pdf-msgs  { padding: 8px 10px; display: flex; flex-direction: column; gap: 7px; }
+.pdf-role  { font-size: 7px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 3px; }
+.pdf-role.user  { color: #777; }
+.pdf-role.model { color: #1a7a4a; }
+.pdf-bubble {
+  border-radius: 5px;
+  padding: 6px 8px;
+  font-size: 7.5px;
+  line-height: 1.5;
+  color: #222;
+  border: 1px solid #e8e8e8;
+}
+.pdf-bubble.user  { background: #f5f6f5; }
+.pdf-bubble.model { background: #fff; }
+.pdf-code {
+  background: #f4f5f4;
+  border-radius: 3px;
+  padding: 4px 6px;
+  font-family: var(--mono);
+  font-size: 6.5px;
+  color: #333;
+  margin-top: 4px;
+  border: 1px solid #e5e5e5;
+}
+
+/* -- Vein divider ----------------------------------- */
+.vein {
+  max-width: 1080px;
+  margin: 0 auto 0;
+  padding: 0 24px;
+}
+.vein-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--mint) 30%, var(--mint) 70%, transparent);
+  opacity: .25;
+}
+
+/* -- Section shared --------------------------------- */
+section {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 72px 24px;
+}
+.section-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--mint);
+  margin-bottom: 12px;
+}
+.section-h2 {
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  font-weight: 800;
+  letter-spacing: -.03em;
+  line-height: 1.2;
+  color: #fff;
+  margin-bottom: 14px;
+}
+.section-sub {
+  font-size: 15px;
+  color: var(--text-2);
+  max-width: 520px;
+  line-height: 1.7;
+  margin-bottom: 44px;
+}
+
+/* -- Features --------------------------------------- */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.feat {
+  background: var(--surface);
+  padding: 28px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: background .2s;
+}
+.feat:hover { background: var(--surface2); }
+.feat-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mint);
+}
+.feat-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -.01em;
+}
+.feat-desc { font-size: 13px; color: var(--text-2); line-height: 1.65; }
+
+/* -- How it works ----------------------------------- */
+#how { padding-top: 0; }
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  position: relative;
+}
+.steps::before {
+  content: '';
+  position: absolute;
+  top: 22px;
+  left: calc(33.33% - 10px);
+  right: calc(33.33% - 10px);
+  height: 1px;
+  background: linear-gradient(90deg, var(--mint-dark), var(--mint-dark));
+  opacity: .5;
+}
+.step { padding: 0 20px 0 0; display: flex; flex-direction: column; gap: 14px; }
+.step:last-child { padding-right: 0; }
+.step-num {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--mint);
+  font-family: var(--mono);
+  position: relative;
+  z-index: 1;
+}
+.step-title { font-size: 14px; font-weight: 700; color: #fff; letter-spacing: -.01em; }
+.step-desc  { font-size: 13px; color: var(--text-2); line-height: 1.65; max-width: 280px; }
+
+/* -- PDF showcase ----------------------------------- */
+#showcase { padding-top: 0; }
+.showcase-window {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0,0,0,.5);
+  max-width: 720px;
+  margin: 0 auto;
+}
+.sw-bar {
+  background: #f0f0f0;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sw-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.sw-dot:nth-child(1) { background: #ff5f57; }
+.sw-dot:nth-child(2) { background: #febc2e; }
+.sw-dot:nth-child(3) { background: #28c840; }
+.sw-title {
+  flex: 1;
+  text-align: center;
+  font-size: 11px;
+  color: #888;
+  font-family: var(--mono);
+  margin-right: 22px;
+}
+.sw-content {
+  padding: 28px 36px 32px;
+}
+.sw-doc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 14px;
+  border-bottom: 2.5px solid #3DF49A;
+  margin-bottom: 22px;
+}
+.sw-doc-title { font-size: 17px; font-weight: 700; color: #111; letter-spacing: -.02em; }
+.sw-doc-sub   { font-size: 9px; color: #888; margin-top: 3px; }
+.sw-brand     { font-size: 9px; color: #aaa; text-align: right; }
+.sw-brand strong { color: #1a7a4a; display: block; font-size: 10px; }
+.sw-msg { margin-bottom: 16px; }
+.sw-role {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.sw-role.user  { color: #888; }
+.sw-role.model { color: #1a7a4a; }
+.sw-bubble {
+  border-radius: 7px;
+  padding: 10px 13px;
+  font-size: 11px;
+  line-height: 1.7;
+  color: #1a1a1a;
+  border: 1px solid #e5e7e5;
+}
+.sw-bubble.user  { background: #f5f6f5; }
+.sw-bubble.model { background: #fff; }
+.sw-bubble p { margin-bottom: 5px; }
+.sw-bubble p:last-child { margin-bottom: 0; }
+.sw-bubble strong { font-weight: 700; }
+.sw-codeblock {
+  background: #f4f5f4;
+  border-radius: 5px;
+  padding: 8px 10px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: #1a1a1a;
+  margin-top: 6px;
+  border: 1px solid #e5e5e5;
+  line-height: 1.6;
+}
+
+/* -- Install section -------------------------------- */
+#install {
+  padding-top: 0;
+}
+.install-tabs {
+  display: flex;
+  gap: 1px;
+  background: var(--border2);
+  border: 1px solid var(--border2);
+  border-radius: 10px 10px 0 0;
+  overflow: hidden;
+}
+.tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 16px;
+  background: var(--surface);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-3);
+  border: none;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.tab-btn:hover { background: var(--surface2); color: var(--text-2); }
+.tab-btn.active {
+  background: var(--bg);
+  color: var(--text);
+}
+.tab-btn.active svg { color: var(--mint); }
+.install-body {
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  padding: 32px;
+}
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.install-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.is-step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.is-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--mint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: var(--mono);
+  margin-top: 1px;
+}
+.is-text { font-size: 13.5px; color: var(--text-2); line-height: 1.65; }
+.is-text strong { color: var(--text); font-weight: 600; }
+.is-text code {
+  font-family: var(--mono);
+  font-size: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--mint);
+}
+.install-note {
+  font-size: 12px;
+  color: var(--text-3);
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 7px;
+  padding: 10px 14px;
+  line-height: 1.6;
+}
+.install-note a {
+  color: var(--mint);
+  text-decoration: underline;
+}
+.dl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+/* -- Footer ----------------------------------------- */
+footer {
+  border-top: 1px solid var(--border2);
+  padding: 28px 24px;
+}
+.footer-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+  color: var(--text-3);
+}
+.footer-links {
+  display: flex;
+  gap: 20px;
+}
+.footer-links a {
+  font-size: 12px;
+  color: var(--text-3);
+  transition: color .15s;
+}
+.footer-links a:hover { color: var(--text-2); }
+
+/* -- Scroll reveal ---------------------------------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity .55s ease, transform .55s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* -- Responsive ------------------------------------- */
+@media (max-width: 860px) {
+  #hero {
+    grid-template-columns: 1fr;
+    padding: 52px 20px 40px;
+    gap: 40px;
+  }
+  .hero-visual { justify-content: flex-start; }
+  .features-grid { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr; gap: 32px; }
+  .steps::before { display: none; }
+  .install-tabs { flex-direction: column; border-radius: 10px 10px 0 0; }
+  .nav-links { gap: 14px; }
+  .sw-content { padding: 18px 20px 22px; }
+}
+@media (max-width: 560px) {
+  .nav-links a:not(.nav-cta) { display: none; }
+  .hero-actions { flex-direction: column; }
+  .btn-primary, .btn-secondary { justify-content: center; }
+  .mock-pdf { display: none; }
+  .mock-arrow { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .hero-eyebrow-dot { transition: none; animation: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- == Nav ========================================== -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <path d="M12 3L4.5 8.5L12 14L19.5 8.5L12 3Z" fill="#3DF49A"/>
+        <path d="M7 11.5L12 21L17 11.5" fill="#1a7a4a"/>
+        <path d="M7 11.5L12 21L17 11.5" stroke="#3DF49A" stroke-width=".8" stroke-linejoin="round"/>
+      </svg>
+      Gem Miner
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#install" class="nav-cta">Download</a>
+    </div>
+  </div>
+</nav>
+
+<!-- == Hero ========================================= -->
+<section id="hero">
+  <div class="hero-copy">
+    <div class="hero-eyebrow">
+      <span class="hero-eyebrow-dot"></span>
+      Free browser extension
+    </div>
+    <h1 class="hero-h1">Your Gemini chats,<br><em>extracted.</em></h1>
+    <p class="hero-sub">
+      One click turns any Gemini conversation into a clean, formatted PDF. Code blocks, tables, headers &mdash; everything preserved, nothing lost.
+    </p>
+    <div class="hero-actions">
+      <a href="#install" class="btn-primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <path d="M12 3v13M12 16l-5-5M12 16l5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M3 19h18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+        Install Extension
+      </a>
+      <a href="https://github.com/mahtamun-hoque-fahim/gem-miner" target="_blank" rel="noopener" class="btn-secondary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        View on GitHub
+      </a>
+    </div>
+    <div class="hero-browsers">
+      Works on
+      <div class="browser-chips">
+        <span class="chip">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="4" fill="currentColor"/></svg>
+          Chrome
+        </span>
+        <span class="chip">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.5"/></svg>
+          Edge
+        </span>
+        <span class="chip">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/><path d="M8 12h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Firefox
+        </span>
+        <span class="chip">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 8l10 6 10-6-10-6z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          Brave
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Visual: Popup + PDF mockup -->
+  <div class="hero-visual">
+    <div class="mock-glow"></div>
+
+    <!-- Popup -->
+    <div class="mock-popup">
+      <div class="mp-header">
+        <div class="mp-logo">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="M12 3L4.5 8.5L12 14L19.5 8.5L12 3Z" fill="#3DF49A"/>
+            <path d="M7 11.5L12 21L17 11.5" fill="#1a7a4a"/>
+          </svg>
+          Gem Miner
+        </div>
+        <span class="mp-badge">v1.0</span>
+      </div>
+      <div class="mp-card">
+        <div class="mp-row">
+          <span class="mp-label">Messages</span>
+          <span class="mp-val">12</span>
+        </div>
+        <div class="mp-row">
+          <span class="mp-label">Conversation</span>
+          <span class="mp-trunc">Python decorators&hellip;</span>
+        </div>
+      </div>
+      <div>
+        <div class="mp-field-label">PDF title</div>
+        <input class="mp-input" value="Python decorators guide" readonly>
+        <div class="mp-theme-row">
+          <div class="mp-theme-btn active">Light</div>
+          <div class="mp-theme-btn">Dark</div>
+        </div>
+        <div class="mp-check">
+          <div class="mp-check-box"></div>
+          Include metadata
+        </div>
+        <div class="mp-check">
+          <div class="mp-check-box"></div>
+          Auto print dialog
+        </div>
+      </div>
+      <div class="mp-export">Export as PDF</div>
+      <div class="mp-status">12 messages ready</div>
+    </div>
+
+    <!-- Arrow -->
+    <div class="mock-arrow">
+      <svg width="28" height="16" viewBox="0 0 28 16" fill="none">
+        <path d="M0 8h24M19 2l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <!-- PDF preview -->
+    <div class="mock-pdf">
+      <div class="pdf-header">
+        <div class="pdf-title">Python decorators guide</div>
+        <div class="pdf-sub">June 16, 2026 &middot; 12 messages</div>
+      </div>
+      <div class="pdf-msgs">
+        <div>
+          <div class="pdf-role user">You</div>
+          <div class="pdf-bubble user">What is a decorator in Python and when should I use one?</div>
+        </div>
+        <div>
+          <div class="pdf-role model">Gemini</div>
+          <div class="pdf-bubble model">
+            A decorator is a function that wraps another function to extend its behavior without modifying it.
+            <div class="pdf-code">@timer<br>def my_function():<br>&nbsp;&nbsp;&nbsp;&nbsp;pass</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="vein"><div class="vein-line"></div></div>
+
+<!-- == Features ====================================== -->
+<section id="features" class="reveal">
+  <div class="section-eyebrow">Why Gem Miner</div>
+  <h2 class="section-h2">Everything you'd want from a chat export</h2>
+  <p class="section-sub">Built for developers and researchers who need to keep records &mdash; not just screenshots.</p>
+
+  <div class="features-grid">
+    <div class="feat">
+      <div class="feat-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+          <polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="feat-title">Clean PDF output</div>
+      <div class="feat-desc">Uses the browser's native print engine &mdash; no pixel-shifted screenshots, no bloated canvas renders. Crisp, searchable, indexable text.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <polyline points="16 18 22 12 16 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="8 6 2 12 8 18"   stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="feat-title">Markdown preserved</div>
+      <div class="feat-desc">Code blocks, tables, bold, italic, headers, blockquotes &mdash; Gemini's rendered HTML is sanitized and re-styled in the export, not flattened.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="feat-title">Light + dark themes</div>
+      <div class="feat-desc">Choose a white page for print or dark background for screen. Both themes ship with proper code block contrast, brand colors, and A4 margins.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="feat-title">Thinking blocks skipped</div>
+      <div class="feat-desc">Gemini 2.5's reasoning traces are automatically excluded. Only the final response lands in your PDF &mdash; no noise, no internal monologue.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="feat-title">Cross-browser</div>
+      <div class="feat-desc">Manifest V3. Works in Chrome, Edge, Brave, Arc, and Firefox 109+. One codebase, no platform-specific hacks, no Node.js required.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="feat-title">Zero dependencies</div>
+      <div class="feat-desc">No npm, no bundler, no jsPDF, no html2canvas. Just a manifest and four plain JS files you can read in an afternoon.</div>
+    </div>
+  </div>
+</section>
+
+<div class="vein"><div class="vein-line"></div></div>
+
+<!-- == How it works ================================== -->
+<section id="how" class="reveal">
+  <div class="section-eyebrow">Three steps</div>
+  <h2 class="section-h2">Open, click, print.</h2>
+  <p class="section-sub">The entire workflow from chat to saved PDF takes under ten seconds.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-title">Open any Gemini conversation</div>
+      <div class="step-desc">Navigate to <strong style="color:var(--text)">gemini.google.com</strong> and open the conversation you want to archive. Gem Miner works on any chat &mdash; short or multi-hour sessions.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-title">Click the toolbar icon</div>
+      <div class="step-desc">The popup scans your conversation in milliseconds, shows a live message count, and lets you set a custom title and color theme before exporting.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-title">Save as PDF</div>
+      <div class="step-desc">A formatted preview opens in a new tab. The browser print dialog launches automatically &mdash; select <strong style="color:var(--text)">Save as PDF</strong> and you're done.</div>
+    </div>
+  </div>
+</section>
+
+<div class="vein"><div class="vein-line"></div></div>
+
+<!-- == PDF showcase =================================== -->
+<section id="showcase" class="reveal">
+  <div class="section-eyebrow">Export preview</div>
+  <h2 class="section-h2">What the PDF looks like</h2>
+  <p class="section-sub">Every structural element of Gemini's response is mapped to clean print-ready HTML. This is the light theme at actual A4 proportions.</p>
+
+  <div class="showcase-window">
+    <div class="sw-bar">
+      <div class="sw-dot"></div>
+      <div class="sw-dot"></div>
+      <div class="sw-dot"></div>
+      <div class="sw-title">Python decorators guide &mdash; PDF Export</div>
+    </div>
+    <div class="sw-content">
+      <div class="sw-doc-header">
+        <div>
+          <div class="sw-doc-title">Python decorators guide</div>
+          <div class="sw-doc-sub">June 16, 2026, 02:14 PM &middot; 12 messages</div>
+        </div>
+        <div class="sw-brand">
+          <strong>Gem Miner</strong>
+          gemini.google.com
+        </div>
+      </div>
+
+      <div class="sw-msg">
+        <div class="sw-role user">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          You
+        </div>
+        <div class="sw-bubble user">
+          <p>What is a decorator in Python and when should I use one? Can you show me an example of a timing decorator?</p>
+        </div>
+      </div>
+
+      <div class="sw-msg">
+        <div class="sw-role model">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M12 3L4.5 8.5L12 14L19.5 8.5L12 3Z" stroke="#1a7a4a" stroke-width="1.8" stroke-linejoin="round"/><path d="M7 11.5L12 19L17 11.5" stroke="#1a7a4a" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          Gemini
+        </div>
+        <div class="sw-bubble model">
+          <p>A <strong>decorator</strong> is a function that wraps another function to extend or modify its behavior &mdash; without permanently changing the original function's source code.</p>
+          <p>Here's a practical timing decorator:</p>
+          <div class="sw-codeblock">import time<br><br>def timer(func):<br>&nbsp;&nbsp;&nbsp;&nbsp;def wrapper(*args, **kwargs):<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;start = time.perf_counter()<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;result = func(*args, **kwargs)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;elapsed = time.perf_counter() - start<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print(f"{func.__name__} ran in {elapsed:.4f}s")<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return result<br>&nbsp;&nbsp;&nbsp;&nbsp;return wrapper<br><br>@timer<br>def slow_operation():<br>&nbsp;&nbsp;&nbsp;&nbsp;time.sleep(1)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="vein"><div class="vein-line"></div></div>
+
+<!-- == Install ======================================== -->
+<section id="install" class="reveal">
+  <div class="section-eyebrow">Get started</div>
+  <h2 class="section-h2">Install Gem Miner</h2>
+  <p class="section-sub">The extension loads unpacked in under a minute. No account, no sign-in, no data leaves your browser.</p>
+
+  <div class="install-tabs" role="tablist">
+    <button class="tab-btn active" data-tab="chrome" role="tab" aria-selected="true">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4" fill="currentColor"/><path d="M12 8h9.27M8 14.5L3.4 6.5M8 14.5L12.73 22" stroke="currentColor" stroke-width="1.6"/></svg>
+      Chrome / Edge / Brave
+    </button>
+    <button class="tab-btn" data-tab="firefox" role="tab" aria-selected="false">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M8.5 8.5C10 6 14 5 17 7c2 1.5 2.5 4 1.5 6.5S15 17 12 17s-5-2-5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      Firefox
+    </button>
+    <button class="tab-btn" data-tab="manual" role="tab" aria-selected="false">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      Download ZIP
+    </button>
+  </div>
+
+  <div class="install-body">
+
+    <!-- Chrome panel -->
+    <div class="tab-panel active" id="tab-chrome">
+      <a href="https://github.com/mahtamun-hoque-fahim/gem-miner/archive/refs/heads/main.zip"
+         class="btn-primary dl-btn" download>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 3v13M12 16l-5-5M12 16l5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 19h18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        Download gem-miner.zip
+      </a>
+      <div class="install-steps">
+        <div class="is-step">
+          <div class="is-num">1</div>
+          <div class="is-text">Download and <strong>unzip</strong> the file above into a permanent folder &mdash; don't delete it after installing.</div>
+        </div>
+        <div class="is-step">
+          <div class="is-num">2</div>
+          <div class="is-text">Open <code>chrome://extensions</code> (or <code>edge://extensions</code> / <code>brave://extensions</code>).</div>
+        </div>
+        <div class="is-step">
+          <div class="is-num">3</div>
+          <div class="is-text">Enable <strong>Developer mode</strong> using the toggle in the top-right corner.</div>
+        </div>
+        <div class="is-step">
+          <div class="is-num">4</div>
+          <div class="is-text">Click <strong>Load unpacked</strong> and select the <code>gem-miner-main</code> folder you unzipped.</div>
+        </div>
+        <div class="is-step">
+          <div class="is-num">5</div>
+          <div class="is-text">Pin the Gem Miner icon to your toolbar via the puzzle-piece extensions menu. Done.</div>
+        </div>
+      </div>
+      <div class="install-note">
+        The extension only has permission to run on <strong>gemini.google.com</strong>. No other sites, no background data collection.
+      </div>
+    </div>
+
+    <!-- Firefox panel -->
+    <div class="tab-panel" id="tab-firefox">
+      <a href="https://github.com/mahtamun-hoque-fahim/gem-miner/archive/refs/heads/main.zip"
+         class="btn-primary dl-btn" download>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 3v13M12 16l-5-5M12 16l5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 19h18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        Download gem-miner.zip
+      </a>
+      <div class="install-steps">
+        <div class="is-step">
+          <div class="is-num">1</div>
+          <div class="is-text">Download and <strong>unzip</strong> the file above.</div>
+        </div>
+        <div class="is-step">
+          <div class="is-num">2</div>
+          <div class="is-text">Open <code>about:debugging</code> in Firefox.</div>
+        </div>
+        <div class="is-step">
+          <div class="is-num">3</div>
+          <div class="is-text">Click <strong>This Firefox</strong> in the left panel, then <strong>Load Temporary Add-on&hellip;</strong></div>
+        </div>
+        <div class="is-step">
+          <div class="is-num">4</div>
+          <div class="is-text">Navigate into the <code>gem-miner-main</code> folder and select the <code>manifest.json</code> file.</div>
+        </div>
+      </div>
+      <div class="install-note">
+        Temporary add-ons in Firefox are removed when you restart the browser. For a persistent install, the extension must be <a href="https://extensionworkshop.com/documentation/publish/" target="_blank" rel="noopener">signed via Mozilla Add-on Hub</a>. A signed release is planned for v1.1.
+      </div>
+    </div>
+
+    <!-- Manual / ZIP panel -->
+    <div class="tab-panel" id="tab-manual">
+      <div class="install-steps">
+        <div class="is-step">
+          <div class="is-num">1</div>
+          <div class="is-text">Clone the repository: <code>git clone https://github.com/mahtamun-hoque-fahim/gem-miner.git</code></div>
+        </div>
+        <div class="is-step">
+          <div class="is-num">2</div>
+          <div class="is-text">Or download the <a href="https://github.com/mahtamun-hoque-fahim/gem-miner/archive/refs/heads/main.zip" style="color:var(--mint);text-decoration:underline">main.zip</a> from GitHub and unzip it.</div>
+        </div>
+        <div class="is-step">
+          <div class="is-num">3</div>
+          <div class="is-text">Load the folder as an unpacked extension in your browser (see Chrome or Firefox instructions in the other tabs).</div>
+        </div>
+        <div class="is-step">
+          <div class="is-num">4</div>
+          <div class="is-text">To regenerate the icons, run <code>python icons/gen.py</code> &mdash; requires <strong>Pillow</strong> (<code>pip install Pillow</code>).</div>
+        </div>
+      </div>
+      <div class="install-note">
+        Source is MIT licensed. PRs welcome at <a href="https://github.com/mahtamun-hoque-fahim/gem-miner" target="_blank" rel="noopener">github.com/mahtamun-hoque-fahim/gem-miner</a>.
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- == Footer ======================================== -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-left">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M12 3L4.5 8.5L12 14L19.5 8.5L12 3Z" fill="#3DF49A"/>
+        <path d="M7 11.5L12 21L17 11.5" fill="#1a7a4a"/>
+      </svg>
+      Gem Miner &mdash; MIT License &mdash; Mahtamun Hoque Fahim
+    </div>
+    <div class="footer-links">
+      <a href="https://github.com/mahtamun-hoque-fahim/gem-miner" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/mahtamun-hoque-fahim/gem-miner/issues" target="_blank" rel="noopener">Report a bug</a>
+      <a href="https://gemini.google.com" target="_blank" rel="noopener">Open Gemini</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* -- Tab switcher ------------------------------------- */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-selected', 'false');
+    });
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected', 'true');
+    document.getElementById('tab-' + target).classList.add('active');
+  });
+});
+
+/* -- Scroll reveal ------------------------------------ */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      io.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
