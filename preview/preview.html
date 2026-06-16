@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gem Miner — Preparing Export</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background: #070807;
+      color: #6b7a6b;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+    }
+
+    .loader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      text-align: center;
+    }
+
+    .gem {
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1;   transform: scale(1); }
+      50%       { opacity: 0.6; transform: scale(0.93); }
+    }
+
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border: 2px solid #252825;
+      border-top-color: #3DF49A;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .err {
+      color: #f45555;
+      max-width: 300px;
+      line-height: 1.6;
+    }
+
+    .err a {
+      color: #3DF49A;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="loader" id="loader">
+    <!-- Gem icon -->
+    <svg class="gem" width="40" height="40" viewBox="0 0 24 24" fill="none">
+      <path d="M12 3L4.5 8.5L12 14L19.5 8.5L12 3Z" fill="#3DF49A"/>
+      <path d="M7 11.5L12 21L17 11.5" fill="#1a7a4a"/>
+      <path d="M7 11.5L12 21L17 11.5" stroke="#3DF49A" stroke-width="1" stroke-linejoin="round"/>
+    </svg>
+    <div class="spinner"></div>
+    <span>Preparing your export&hellip;</span>
+  </div>
+
+  <script src="preview.js"></script>
+</body>
+</html>
